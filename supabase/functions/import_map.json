@@ -1,0 +1,6 @@
+{
+    "imports": {
+        "langchain/": "https://esm.sh/langchain/",
+        "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.26.0"
+    }
+}
