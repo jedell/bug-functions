@@ -277,11 +277,15 @@ async function getLikedEvents(userId: string): Promise<Event[]> {
     return data.map(item => item.event_id);
 }
 
-export async function embedLikedEvents(userId: string): Promise<void> {
+/**
+ * Embeds the liked events of a user.
+ * @param userId - The ID of the user.
+ * @returns A promise that resolves when the operation is complete.
+ */
+export async function embed_liked_events(userId: string): Promise<void> {
     const likedEvents = await getLikedEvents(userId);
     const eventEmbeddings = await embed_events(likedEvents);
 
-    // Store the embeddings in the events table
     for (let i = 0; i < likedEvents.length; i++) {
         const { error } = await supabase
             .from('events')
@@ -293,7 +297,12 @@ export async function embedLikedEvents(userId: string): Promise<void> {
     }
 }
 
-export async function getSimilarEvents(userId: string): Promise<string[]> {
+/**
+ * Fetches similar events for a user.
+ * @param userId - The ID of the user.
+ * @returns A promise that resolves to an array of similar event IDs.
+ */
+export async function get_similar_events(userId: string): Promise<string[]> {
     const { data, error } = await supabase
         .rpc('match_documents', { query_embedding: userId, match_threshold: 0.5, match_count: 5 });
 
@@ -305,10 +314,16 @@ export async function getSimilarEvents(userId: string): Promise<string[]> {
     return data.map(event => event.id);
 }
 
-export async function generateMoreEvents(similarEvents: string[]): Promise<string> {
+/**
+ * Generates more events based on similar events.
+ * @param similarEvents - An array of similar event IDs.
+ * @returns A promise that resolves to a string containing the generated events.
+ */
+export async function generate_friend_events(similarEvents: string[]): Promise<string> {
     const output = await model.call([
         new SystemChatMessage('Based on the events above, generate more events that both the user and their friend would enjoy doing together'),
         new HumanChatMessage(similarEvents.join('\n')),
 	]);
     return output.text;
+}
 }
