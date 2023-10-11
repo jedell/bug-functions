@@ -23,8 +23,12 @@ import {
 	get_context_events,
 	get_events,
 	save_events,
+embed_events,
 } from "./events.ts";
 import { ChainValues } from "https://esm.sh/v127/langchain@0.0.100/dist/schema/index.js";
+import { supabase } from "./supabase-client.ts";
+import { HumanChatMessage } from "https://esm.sh/v127/langchain@0.0.100/dist/schema/index.js";
+import { SystemChatMessage } from "https://esm.sh/v127/langchain@0.0.100/dist/schema/index.js";
 
 const MAX_EVENT_VALUE = 5;
 
@@ -273,21 +277,9 @@ async function getLikedEvents(userId: string): Promise<Event[]> {
     return data.map(item => item.event_id);
 }
 
-// worm.ts
-
-import { getLikedEvents } from './utils.ts';
-import { OpenAIEmbeddings } from 'langchain';
-
-const embedding_model = new OpenAIEmbeddings({
-	modelName: "text-embedding-ada-002",
-	openAIApiKey: Deno.env.get("OPENAI_API_KEY") as string,
-});
-
-// worm.ts
-
 export async function embedLikedEvents(userId: string): Promise<void> {
     const likedEvents = await getLikedEvents(userId);
-    const eventEmbeddings = await embedding_model.embedDocuments(likedEvents);
+    const eventEmbeddings = await embed_events(likedEvents);
 
     // Store the embeddings in the events table
     for (let i = 0; i < likedEvents.length; i++) {
@@ -313,19 +305,10 @@ export async function getSimilarEvents(userId: string): Promise<string[]> {
     return data.map(event => event.id);
 }
 
-import { ChatOpenAI } from 'langchain';
-import { supabase } from "./supabase-client.ts";
-
-const model = new ChatOpenAI({
-	modelName: "gpt-3.5-turbo",
-	maxTokens: 500,
-	openAIApiKey: Deno.env.get("OPENAI_API_KEY") as string,
-});
-
 export async function generateMoreEvents(similarEvents: string[]): Promise<string> {
-    const output = await model.call({
-        question: 'Generate more events that both the user and their friend would enjoy doing together',
-        context: similarEvents.join('\n'),
-    });
+    const output = await model.call([
+        new SystemChatMessage('Based on the events above, generate more events that both the user and their friend would enjoy doing together'),
+        new HumanChatMessage(similarEvents.join('\n')),
+	]);
     return output.text;
 }
