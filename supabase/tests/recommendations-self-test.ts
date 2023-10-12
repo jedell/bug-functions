@@ -27,10 +27,7 @@ const testRecommendationsSelf = async () => {
 	// Invoke the 'recommendations-self' function with a parameter
   const { data: func_data, status: func_status } = await callFunction("recommendations-self", {
     body: body,
-  });
-
-  // Check for errors from the function invocation
-  
+  });  
 
 	// Check for errors from the function invocation
 	if (func_status != 200) {

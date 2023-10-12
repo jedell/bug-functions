@@ -1,9 +1,10 @@
 import { config } from "https://deno.land/x/dotenv/mod.ts";
 import { insert } from "../../functions/_shared/database.ts";
-import { supabase } from "../../functions/_shared/supabase-client.ts";
 
 const supabaseUrl = config({ path: ".env.test" }).MY_SUPABASE_URL;
 const supabaseKey = config({ path: ".env.test" }).MY_SUPABASE_KEY;
+
+export const supabase_test_client = createClient(supabaseUrl!, supabaseKey!);
 
 export async function createDummyUsers(count: number): Promise<string[]> {
     const ids: string[] = [];
@@ -27,7 +28,7 @@ export async function createDummyUsers(count: number): Promise<string[]> {
 }
 
 export async function getRandomUsers(count: number): Promise<any[]> {
-    const { data, error } = await supabase
+    const { data, error } = await supabase_test_client
         .from('users')
         .select('*')
         .range(0, count - 1);
@@ -62,4 +63,13 @@ export async function callFunction(
 	const data = await response.json();
   const status = response.status;
 	return { data, status };
+}
+
+export function mockSupabaseClient() {
+    supabase_test_client.from = jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        upsert: jest.fn().mockReturnThis(),
+        rpc: jest.fn().mockReturnThis(),
+    });
 }
