@@ -1,8 +1,11 @@
 import { config } from "https://deno.land/x/dotenv/mod.ts";
 import { insert } from "../../functions/_shared/database.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.26.0";
 
 const supabaseUrl = config({ path: ".env.test" }).MY_SUPABASE_URL;
 const supabaseKey = config({ path: ".env.test" }).MY_SUPABASE_KEY;
+
+console.log(supabaseUrl, supabaseKey)
 
 export const supabase_test_client = createClient(supabaseUrl!, supabaseKey!);
 
@@ -63,13 +66,4 @@ export async function callFunction(
 	const data = await response.json();
   const status = response.status;
 	return { data, status };
-}
-
-export function mockSupabaseClient() {
-    supabase_test_client.from = jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        upsert: jest.fn().mockReturnThis(),
-        rpc: jest.fn().mockReturnThis(),
-    });
 }
