@@ -79,7 +79,7 @@ const embedding_model = new OpenAIEmbeddings({
 export async function generate_events(
 	user_id: string
 ): Promise<[Event[], boolean]> {
-	let [events, is_default] = get_context_events(user_id);
+	let [events, is_default] = await get_context_events(user_id);
 
 	if (!is_default) {
 		const events_list = await create_init_events_list(user_id, events);
@@ -263,7 +263,7 @@ export async function generate_final_event(
 /**
  * RAG
  */
-async function getLikedEvents(userId: string): Promise<Event[]> {
+async function get_liked_events(userId: string): Promise<Event[]> {
     const { data, error } = await supabase
         .from('event_likes')
         .select('event_id')
@@ -283,7 +283,7 @@ async function getLikedEvents(userId: string): Promise<Event[]> {
  * @returns A promise that resolves when the operation is complete.
  */
 export async function embed_liked_events(userId: string): Promise<void> {
-    const likedEvents = await getLikedEvents(userId);
+    const likedEvents = await get_liked_events(userId);
     const eventEmbeddings = await embed_events(likedEvents);
 
     for (let i = 0; i < likedEvents.length; i++) {
@@ -325,5 +325,4 @@ export async function generate_friend_events(similarEvents: string[]): Promise<s
         new HumanChatMessage(similarEvents.join('\n')),
 	]);
     return output.text;
-}
 }

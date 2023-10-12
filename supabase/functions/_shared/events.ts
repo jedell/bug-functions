@@ -8,7 +8,8 @@
 
 import { Event, EventResponse } from "./types.ts";
 import { get_embeddings } from "./worm.ts";
-import { fetch, fetch_all_by_in, insert } from "./database.ts";
+import { fetch_all_by_in, insert } from "./database.ts";
+import { supabase } from "./supabase-client.ts";
 
 /**
  * Returns a list of context events for the user

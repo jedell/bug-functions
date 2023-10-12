@@ -6,7 +6,6 @@ import {
 } from "https://deno.land/std@0.192.0/testing/asserts.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
 import { callFunction } from "./utils/test_utils.ts";
-import { supabase } from "../functions/_shared/supabase-client.ts";
 
 // Set up the configuration for the Supabase client
 const supabaseUrl = config({ path: ".env.test" }).MY_SUPABASE_URL;
