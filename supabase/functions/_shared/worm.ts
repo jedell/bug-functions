@@ -302,16 +302,17 @@ export async function embed_liked_events(userId: string): Promise<void> {
  * @param userId - The ID of the user.
  * @returns A promise that resolves to an array of similar event IDs.
  */
-export async function get_similar_events(userId: string): Promise<string[]> {
+export async function get_similar_events(event: Event): Promise<Event[]> {
+	const event_text = event.title + " " + event.description;
     const { data, error } = await supabase
-        .rpc('match_documents', { query_embedding: userId, match_threshold: 0.5, match_count: 5 });
+        .rpc('match_documents', { query_embedding: event_text, match_threshold: 0.5, match_count: 5 });
 
     if (error) {
         console.error('Error fetching similar events:', error.message);
         return [];
     }
 
-    return data.map(event => event.id);
+    return data as Event[];
 }
 
 /**
