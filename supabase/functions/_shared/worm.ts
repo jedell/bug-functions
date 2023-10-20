@@ -263,7 +263,7 @@ export async function generate_final_event(
 /**
  * RAG
  */
-async function get_liked_events(userId: string): Promise<Event[]> {
+export async function get_liked_events(userId: string): Promise<Event[]> {
     const { data, error } = await supabase
         .from('event_likes')
         .select('event_id')
@@ -319,10 +319,16 @@ export async function get_similar_events(userId: string): Promise<string[]> {
  * @param similarEvents - An array of similar event IDs.
  * @returns A promise that resolves to a string containing the generated events.
  */
-export async function generate_friend_events(similarEvents: string[]): Promise<string> {
+export async function generate_friend_events(similarEvents: Event[]): Promise<string> {
+	const event_texts: string[] = similarEvents.map(
+		(event: Event) => {
+			return event.title + " " + event.description
+		}
+	)
+
     const output = await model.call([
         new SystemChatMessage('Based on the events above, generate more events that both the user and their friend would enjoy doing together'),
-        new HumanChatMessage(similarEvents.join('\n')),
+        new HumanChatMessage(event_texts.join('\n')),
 	]);
     return output.text;
 }

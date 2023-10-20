@@ -8,9 +8,6 @@ import { embed_liked_events, get_similar_events, generate_friend_events } from '
 serve(async (req) => {
   const { user_id, friend_id } = await req.json();
 
-  await embed_liked_events(user_id);
-  await embed_liked_events(friend_id);
-
   const userSimilarEvents = await get_similar_events(user_id);
   const friendSimilarEvents = await get_similar_events(friend_id);
 
