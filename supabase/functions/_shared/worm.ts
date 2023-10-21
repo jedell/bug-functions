@@ -29,6 +29,7 @@ import { ChainValues } from "https://esm.sh/v127/langchain@0.0.100/dist/schema/i
 import { supabase } from "./supabase-client.ts";
 import { HumanChatMessage } from "https://esm.sh/v127/langchain@0.0.100/dist/schema/index.js";
 import { SystemChatMessage } from "https://esm.sh/v127/langchain@0.0.100/dist/schema/index.js";
+import { activityListTemplate, finalActivityTemplate, finalEventPrompt, friendGeneratePrompt, generateEventsPrompt } from "./config/prompts.ts";
 
 const MAX_EVENT_VALUE = 5;
 
@@ -110,11 +111,9 @@ function generate_feedback_context(
 }
 
 function generate_question(num_activities: number): string {
-	return (
-		"Using the following information about the user's preferences, create a list of " +
-		num_activities +
-		" new activities that the user would enjoy as well."
-	);
+	const template = generateEventsPrompt;
+
+	return template.replace('{number}', num_activities.toString());
 }
 
 async function call_llm_chain(question: string, context: string) : Promise<ChainValues> {
@@ -125,14 +124,7 @@ async function call_llm_chain(question: string, context: string) : Promise<Chain
 }
 
 function create_prompt(): PromptTemplate {
-	const template = `Question: {question}
-
-    Context: {context}
-
-    {format_instructions}
-
-    Answer: Here is the list of activities:
-    `;
+	const template = activityListTemplate;
 
 	return new PromptTemplate({
 		template: template,
@@ -224,19 +216,9 @@ export async function generate_final_event(
 		)
 		.join("\n\n");
 
-	const context = "User likes the following events:\n\n" + liked_events_text;
-
-	const question =
-		"Using the following list of events that the user enjoys, can you create a detailed description of a new activity that the user would enjoy?";
-
-	const template = `Question: {question}
-
-    Context: {context}
-
-    {format_instructions}
-
-    Answer: Here is the activity:
-    `;
+	const context = "\n\n" + liked_events_text;
+	const question = finalEventPrompt;
+	const template = finalActivityTemplate;
 
 	const prompt = new PromptTemplate({
 		template: template,
@@ -328,7 +310,7 @@ export async function generate_friend_events(similarEvents: Event[]): Promise<st
 	)
 
     const output = await model.call([
-        new SystemChatMessage('Based on the events above, generate more events that both the user and their friend would enjoy doing together'),
+        new SystemChatMessage(friendGeneratePrompt),
         new HumanChatMessage(event_texts.join('\n')),
 	]);
     return output.text;
