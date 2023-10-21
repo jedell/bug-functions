@@ -6,7 +6,7 @@ import {
 } from "./types.ts";
 import { get_events, map_event_response, map_event_responses, save_events } from "./events.ts";
 import { get_recommendation } from "./recommendations.ts";
-import { update_event_likes, update_likes_graph } from "./likes.ts";
+import { update_event_likes, update_event_likes_list, update_likes_graph } from "./likes.ts";
 import { generate_final_event, create_new_events_list } from "./worm.ts";
 
 export async function process_feedback(
@@ -68,9 +68,7 @@ export async function process_self_feedback(
 
 	update_likes_graph(recommendation, feedback_data);
 	// register likes for user
-	feedback_data.liked.forEach(
-		(event_id: string) => update_event_likes(recommendation.user_id, event_id)
-	)
+	update_event_likes_list(recommendation.user_id, feedback_data.liked);
 
 	// check if feedback is complete (all events are liked, none are disliked or neutral)
 	const feedback_complete =
@@ -91,9 +89,18 @@ export async function process_friend_feedback(
 	const recommendation = await get_recommendation(recommendation_id);
 
 	update_likes_graph(recommendation, feedback_data);
+	update_event_likes_list(from_user_id, feedback_data.liked)
 
+	const feedback_complete = 
+		feedback_data.liked.length === recommendation.events.length;
 
+	if (feedback_complete) {
+		return await process_complete_feedback_friend(recommendation);
+	} else {
+		return await process_incomplete_feedback(recommendation, feedback_data);
+	}
 }
+
 
 async function process_complete_feedback(recommendation: Recommendation): Promise<{ unique_events: Event[]; recommendation: Recommendation }> {
 
