@@ -8,7 +8,7 @@ import { update_recommendation_status, update_recommendation_events } from "../_
 import { RecommendationStatus } from "../_shared/types.ts";
 
 serve(async (req) => {
-  const { user_id, event_id, feedback, recommendation_id } = await req.json();
+  const { recommendation_id, from_user_id, liked, disliked, neutral } = await req.json();
 
   // Record the user's feedback in the event_likes table
   const { error, data } = await supabase
