@@ -9,6 +9,7 @@ import {
 } from "../_shared/recommendations.ts";
 import { RecommendationStatus } from "../_shared/types.ts";
 import { process_self_feedback } from "../_shared/feedback.ts";
+import { corsHeaders } from "../_shared/cors.ts";
 
 /*
   TODO:
@@ -20,7 +21,14 @@ import { process_self_feedback } from "../_shared/feedback.ts";
   */
 
 serve(async (req) => {
+
+	if (req.method === 'OPTIONS') {
+		return new Response('ok', { headers: corsHeaders })
+	}
+
 	const { recommendation_id, liked, disliked, neutral } = await req.json();
+
+	console.log(`Received feedback for recommended events. ID: ${recommendation_id}`)
 
 	const response = await process_self_feedback(recommendation_id, {
 		liked,
@@ -48,6 +56,6 @@ serve(async (req) => {
 	};
 
 	return new Response(JSON.stringify(data), {
-		headers: { "Content-Type": "application/json" },
+		headers: { ...corsHeaders, "Content-Type": "application/json" },
 	});
 });

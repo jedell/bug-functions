@@ -1,0 +1,64 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+#app {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card {
+  padding: 0.5em;
+  background-color: #a5a5dc; /* Light Beige */
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin: 0.5em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 30%;
+}
+
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+
+.button {
+  border-radius: 10px;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background: linear-gradient(90deg, var(--c1, #ADFF2F), var(--c2, #FFC0CB) 51%, var(--c1, #ADFF2F)) var(--x, 0)/ 200%;
+  color: white;
+  cursor: pointer;
+  text-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+  padding: 0.5em 1em;
+  font-size: 0.9em;
+  margin: 0.5em;
+  transition: background 0.3s ease;
+  border: none;
+  color: white;
+}
+
+.button:hover {
+  --x: 100%;
+}
+
+.button.liked {
+  background: linear-gradient(90deg, #228b22, #556b2f 51%, #228b22) var(--x, 0)/ 200%;
+  transition: background 0.3s ease;
+}
+
+.button.disliked {
+  background: linear-gradient(90deg, #b7410e, #cc3f0c 51%, #b7410e) var(--x, 0)/ 200%;
+  transition: background 0.3s ease;
+}

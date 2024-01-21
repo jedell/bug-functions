@@ -22,10 +22,13 @@ const finalEventPrompt = "Using the following list of events that the user enjoy
 
 const friendGeneratePrompt = 'Based on the events above, generate more events that both the user and their friend would enjoy doing together'
 
+const MAX_EVENT_NUMBER = 5;
+
 export {
     activityListTemplate,
     finalActivityTemplate,
     generateEventsPrompt,
     finalEventPrompt,
-    friendGeneratePrompt
+    friendGeneratePrompt,
+    MAX_EVENT_NUMBER
 }

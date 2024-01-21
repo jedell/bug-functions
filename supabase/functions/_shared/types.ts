@@ -65,7 +65,7 @@ export interface User {
   
   export interface Recommendation {
     id: string;
-    events: string[];
+    events: Event[];
     user_id: string;
     other_user_ids?: string[];
     type: RecommendationType;

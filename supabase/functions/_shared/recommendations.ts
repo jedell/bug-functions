@@ -20,7 +20,7 @@ export function create_recommendation(
     const recommendation: Recommendation = {
         id: crypto.randomUUID(),
         user_id: user_id,
-        events: events.map((event) => event.id),
+        events: events,
         other_user_ids: other_user_ids,
         type: type,
         status: status,
@@ -31,27 +31,40 @@ export function create_recommendation(
 }
 
 export function update_recommendation_status(recommendation: Recommendation, status: RecommendationStatus): Recommendation {
+    console.log(`Updating recommendation status for recommendation ID: ${recommendation.id}`);
     recommendation.status = status
 
-    upsert("recommendations", recommendation)
-
+    upsert("recommendations", recommendation).then(() => {
+        console.log(`Updated recommendation status for recommendation ID: ${recommendation.id} to ${status}`);
+    });
     return recommendation
 }
 
 export function save_recommendation(recommendation: Recommendation): void {
-    insert("recommendations", recommendation)
+    console.log(`Saving recommendation with ID: ${recommendation.id}`);
+    const to_insert = {...recommendation, events: recommendation.events.map(event => event.id)};
+    insert("recommendations", to_insert).then(() => {
+        console.log(`Saved recommendation with ID: ${recommendation.id}`)
+    });
 }
 
 export async function get_recommendation(recommendation_id: string): Promise<Recommendation> {
+    console.log(`Fetching recommendation with ID: ${recommendation_id}`);
     const response = await fetch("recommendations", recommendation_id)
+    console.log(`Fetched recommendation with ID: ${recommendation_id}`);
 
     return response as Recommendation
 }
 
-export function update_recommendation_events(recommendation: Recommendation, events: Event[]): Recommendation {
-    recommendation.events = events.map((event) => event.id)
 
-    upsert("recommendations", recommendation)
+export function update_recommendation_events(recommendation: Recommendation, events: Event[]): Recommendation {
+    console.log(`Updating events for recommendation ID: ${recommendation.id}`);
+    recommendation.events = events
+    const to_insert = {...recommendation, events: events.map((event) => event.id)}
+
+    upsert("recommendations", to_insert).then(() => {
+        console.log(`Updated events for recommendation ID: ${recommendation.id}`);
+    });
 
     return recommendation
 }

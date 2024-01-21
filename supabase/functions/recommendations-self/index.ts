@@ -5,8 +5,14 @@
 import { serve } from "https://deno.land/std@0.192.0/http/server.ts"
 import { create_and_save_recommendation } from "../_shared/recommendations.ts"
 import { generate_events } from "../_shared/worm.ts"
+import { corsHeaders } from "../_shared/cors.ts"
 
 serve(async (req) => {
+
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
   const { user_id } = await req.json()
 
   const [events, is_default] = await generate_events(user_id)
@@ -19,6 +25,6 @@ serve(async (req) => {
 
   return new Response(
     JSON.stringify(data),
-    { headers: { "Content-Type": "application/json" } },
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } },
   )
 })

@@ -29,9 +29,7 @@ import { ChainValues } from "https://esm.sh/v127/langchain@0.0.100/dist/schema/i
 import { supabase } from "./supabase-client.ts";
 import { HumanChatMessage } from "https://esm.sh/v127/langchain@0.0.100/dist/schema/index.js";
 import { SystemChatMessage } from "https://esm.sh/v127/langchain@0.0.100/dist/schema/index.js";
-import { activityListTemplate, finalActivityTemplate, finalEventPrompt, friendGeneratePrompt, generateEventsPrompt } from "./config/prompts.ts";
-
-const MAX_EVENT_VALUE = 5;
+import { MAX_EVENT_NUMBER, activityListTemplate, finalActivityTemplate, finalEventPrompt, friendGeneratePrompt, generateEventsPrompt } from "./config/prompts.ts";
 
 export const activityResponseSchema: z.ZodType<ActivityResponse> = z.object({
 	activities: z
@@ -43,7 +41,7 @@ export const activityResponseSchema: z.ZodType<ActivityResponse> = z.object({
 					.describe("brief and specific description of the event"),
 			})
 		)
-		.max(MAX_EVENT_VALUE)
+		.max(MAX_EVENT_NUMBER)
 		.describe("list of activities"),
 });
 
@@ -136,14 +134,15 @@ function create_prompt(): PromptTemplate {
 export async function create_new_events_list(
 	liked_events_text: string,
 	disliked_events_text: string,
-	neutral_events_text: string
+	neutral_events_text: string,
+	num_to_generate: number
 ): Promise<EventResponse[]> {
 	const context = generate_feedback_context(
 		liked_events_text,
 		disliked_events_text,
 		neutral_events_text
 	);
-	const question = generate_question(MAX_EVENT_VALUE);
+	const question = generate_question(num_to_generate);
 
 	const output = await call_llm_chain(question, context);
 
@@ -155,7 +154,7 @@ export async function create_new_events_list(
 function generate_inital_prompt(
 	events: Event[]
 ): [ string, string] {
-	const question = generate_question(MAX_EVENT_VALUE);
+	const question = generate_question(MAX_EVENT_NUMBER);
 
 	const context = events
 		.map(

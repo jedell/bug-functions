@@ -44,6 +44,7 @@ The project follows the Supabse Edge Functions project structure.
 #### 3. Run the following command to start the server:
 
 ```bash
+supabase start
 supabase functions serve --debug --env-file ./supabase/.env
 ```
 
